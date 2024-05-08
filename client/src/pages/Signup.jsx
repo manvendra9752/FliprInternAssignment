@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../redux/features/alertSlice";
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,21 +20,20 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(showLoading());
       const res = await axios.post(
-        "http://localhost:8080/api/auth/signup",
+        "https://fliprinternassignment.onrender.com/api/auth/signup",
         formData
       );
+      dispatch(hideLoading());
       if (res.data.success) {
-        // Signup successful, display success message or redirect to login page
         navigate("/login");
         alert("Signup successful! Please login to continue.");
-        // Example: Redirect to login page
-        // history.push("/login");
       } else {
-        // Signup failed, display error message
         alert("Signup failed: " + res.data.message);
       }
     } catch (error) {
+      dispatch(showLoading());
       console.error("Error signing up:", error);
       alert("An error occurred while signing up");
     }
@@ -97,6 +99,9 @@ const Signup = () => {
             required
           />
         </div>
+        <Link to="/login" className="m-2">
+          Already user login here
+        </Link>
         <div className="flex items-center justify-between">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

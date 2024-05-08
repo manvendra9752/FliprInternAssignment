@@ -20,7 +20,7 @@ const PurchaseOrderForm = ({ customerId }) => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/purchase-orders/add",
+        "https://fliprinternassignment.onrender.com/api/purchase-orders/add",
         {
           ...formData,
           customerId: customerId, // Pass customerId obtained from props

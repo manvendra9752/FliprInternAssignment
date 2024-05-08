@@ -1,31 +1,35 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
+const userModel = require("../models/User");
 
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    const userExist = await User.findOne({ email });
-    if (userExist) {
-      return res.status(401).json({ message: "Already email registered" });
+    const exisitingUser = await userModel.findOne({ email: req.body.email });
+    if (exisitingUser) {
+      return res
+        .status(200)
+        .send({ message: "User Already Exist", success: false });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword });
-    await user.save();
-    res.status(201).send({
-      success: true,
-      message: "User registered successfully",
-      data: user,
-    });
+    const password = req.body.password;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    req.body.password = hashedPassword;
+    const newUser = new userModel(req.body);
+    await newUser.save();
+    res.status(201).send({ message: "Register Sucessfully", success: true });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: `Register Controller ${error.message}`,
+    });
   }
 };
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await userModel.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -44,4 +48,28 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const authControl = async (req, res) => {
+  try {
+    const user = await userModel.findById({ _id: req.body.userId });
+    user.password = undefined;
+    if (!user) {
+      return res.status(200).send({
+        message: "user not found",
+        success: false,
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        data: user,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "auth error",
+      success: false,
+      error,
+    });
+  }
+};
+module.exports = { register, login, authControl };

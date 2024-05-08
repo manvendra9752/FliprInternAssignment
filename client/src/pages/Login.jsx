@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../redux/features/alertSlice";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,22 +20,23 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(showLoading());
       const res = await axios.post(
-        "http://localhost:8080/api/auth/login",
+        "https://fliprinternassignment.onrender.com/api/auth/login",
         formData
       );
+      // window.location.reload();
+      dispatch(hideLoading());
       if (res.data.success) {
-        // Login successful, redirect or perform other actions
-        navigate("/customerManagement");
-        alert("Login successful");
-        // Example: Redirect to dashboard
-        // history.push("/dashboard");
+        localStorage.setItem("token", res.data.token);
+        alert("Login Successfully");
+        navigate("/");
       } else {
-        // Login failed, display error message
-        alert("Login failed: " + res.data.message);
+        alert(res.data.message);
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      dispatch(hideLoading());
+      console.log(error);
       alert("An error occurred while logging in");
     }
   };
@@ -78,6 +83,9 @@ const Login = () => {
             required
           />
         </div>
+        <Link to="/signup" className="m-2">
+          Not a user Register here
+        </Link>
         <div className="flex items-center justify-between">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

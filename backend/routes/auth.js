@@ -1,20 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const middleware = require("../middleware/auth");
 
 router.post("/signup", authController.register);
 router.post("/login", authController.login);
+router.post("/getUserData", middleware, authController.authControl);
 
 module.exports = router;
-
-// Protect Routes with Auth Middleware
-//For routes that require authentication, use the authenticate middleware.
-// const express = require('express');
-// const router = express.Router();
-// const authMiddleware = require('../middleware/auth');
-
-// router.get('/', authMiddleware, (req, res) => {
-//   // Route logic
-// });
-
-// module.exports = router;

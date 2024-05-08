@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../redux/features/alertSlice";
+// import CustomerDetailsTable from "./CustomerDetailsTable";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
-  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
-  const [customerDetails, setCustomerDetails] = useState(null);
+
+  const dispatch = useDispatch();
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/");
+      // dispatch(showLoading());
+      const res = await axios.get(
+        "https://fliprinternassignment.onrender.com/"
+      );
+      // dispatch(hideLoading());
       setDashboardData(res.data);
     } catch (error) {
+      // dispatch(hideLoading());
       console.error("Error fetching dashboard data:", error);
-    }
-  };
-
-  const fetchCustomerDetails = async (customerId) => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8080/api/customers/${customerId}`
-      );
-      setCustomerDetails(res.data);
-      setSelectedCustomerId(customerId);
-    } catch (error) {
-      console.error("Error fetching customer details:", error);
     }
   };
 
@@ -61,7 +57,9 @@ const Dashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         className="text-blue-500"
-                        onClick={() => fetchCustomerDetails(customer._id)}
+                        // onClick={() => (
+                        //   <CustomerDetailsTable customerId={customer._id} />
+                        // )}
                       >
                         {customer.email}
                       </button>
@@ -73,30 +71,6 @@ const Dashboard = () => {
                 ))}
             </tbody>
           </table>
-        </div>
-        <div>
-          {selectedCustomerId && (
-            <>
-              <h2 className="text-xl font-bold mb-2">Shipping Details</h2>
-              <ul>
-                {customerDetails?.shippingDetails.map((shipping) => (
-                  <li key={shipping._id}>
-                    Address: {shipping.address}, {shipping.city} - Pincode:{" "}
-                    {shipping.pincode}
-                  </li>
-                ))}
-              </ul>
-              <h2 className="text-xl font-bold mb-2">Purchase Orders</h2>
-              <ul>
-                {customerDetails.purchaseOrders.map((order) => (
-                  <li key={order._id}>
-                    Product Name: {order.productName} - Quantity:{" "}
-                    {order.quantity} - Price: {order.pricing}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
         </div>
       </div>
     </div>

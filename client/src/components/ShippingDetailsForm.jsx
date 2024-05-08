@@ -16,10 +16,13 @@ const ShippingDetailsForm = ({ purchaseId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/shipping-details/add", {
-        ...formData,
-        purchaseId: purchaseId,
-      });
+      await axios.post(
+        "https://fliprinternassignment.onrender.com/api/shipping-details/add",
+        {
+          ...formData,
+          purchaseId: purchaseId,
+        }
+      );
       alert("Shipping details added successfully");
       // Clear form fields after successful submission
       setFormData({

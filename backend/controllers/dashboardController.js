@@ -16,7 +16,6 @@ const getDashboardData = async (req, res) => {
       shippingDetails,
     };
 
-    // Send response
     res.json(dashboardData);
   } catch (error) {
     res.status(500).json({ message: error.message });

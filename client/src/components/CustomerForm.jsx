@@ -23,7 +23,7 @@ const CustomerForm = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/customers/add",
+        "https://fliprinternassignment.onrender.com/api/customers/add",
         formData
       );
       alert("Customer added successfully");

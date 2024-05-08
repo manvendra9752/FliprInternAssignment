@@ -1,19 +1,25 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+// authController.js
+const JWT = require("jsonwebtoken");
 
-const authenticate = async (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
-    const token = req.header("Authorization").replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded.userId });
-    if (!user) {
-      throw new Error();
-    }
-    req.user = user;
-    next();
+    const token = req.headers["authorization"].split(" ")[1];
+    JWT.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({
+          message: "Auth Failed",
+          success: false,
+        });
+      } else {
+        req.body.userId = decoded.userId; // Update to use correct property name
+        next();
+      }
+    });
   } catch (error) {
-    res.status(401).json({ message: "Please authenticate" });
+    console.log(error);
+    res.status(401).send({
+      message: "Auth Failed",
+      success: false,
+    });
   }
 };
-
-module.exports = authenticate;
